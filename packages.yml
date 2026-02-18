@@ -1,0 +1,5 @@
+packages:
+  - package: dbt-labs/dbt_utils
+    version: 1.3.3
+
+#This package aligns to the snapshot we made, as we made a surrogate key in that sql file
