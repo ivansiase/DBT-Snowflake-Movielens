@@ -30,8 +30,16 @@ dbt (Transformation Layer)
     ├── Fact & Dimension Models
     ├── Snapshots (SCD)
     └── Tests (Generic + Custom)
+## 🏗 Architecture
 
----
+```plaintext
+Snowflake Infrastructure        dbt Transformation Layer
+---------------------           -----------------------
+Warehouse                       Sources
+Database                        Staging Models
+Schemas (RAW, STAGING, MART)    Fact & Dimension Models
+Roles & Grants                   Snapshots (SCD)
+Storage Integration              Tests (Generic + Custom)
 
 ## 🧱 Snowflake Setup
 
