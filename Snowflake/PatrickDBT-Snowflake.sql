@@ -1,0 +1,118 @@
+Use ROLE ACCOUNTADMIN;
+
+-- Create the role and assign it to ACCOUNTADMIN
+CREATE ROLE IF NOT EXISTS PATRICKTRANSFORM;
+GRANT ROLE PATRICKTRANSFORM TO ROLE ACCOUNTADMIN;
+
+-- Create a default warehouse
+CREATE WAREHOUSE IF NOT EXISTS COMPUTE_WH;
+GRANT OPERATE ON WAREHOUSE COMPUTE_WH to role PATRICKTRANSFORM;
+
+-- Create the `dbt` user and assign to the transform role
+CREATE USER IF NOT EXISTS dbt
+  PASSWORD='dbtPassword123'
+  LOGIN_NAME='dbt'
+  MUST_CHANGE_PASSWORD=FALSE
+  DEFAULT_WAREHOUSE='COMPUTE_WH'
+  DEFAULT_ROLE=PATRICKTRANSFORM
+  DEFAULT_NAMESPACE='MOVIELENS.RAW'
+  COMMENT='DBT user used for data transformation';
+ALTER USER dbt SET TYPE = LEGACY_SERVICE;  --This user is for automation (like dbt), not a human logging in.
+GRANT ROLE PATRICKTRANSFORM TO USER dbt;
+
+-- Create a database and schema for the MovieLens project
+CREATE DATABASE IF NOT EXISTS MOVIELENS;
+CREATE SCHEMA IF NOT EXISTS MOVIELENS.RAW;
+
+-- Grant permissions to the `transform` role
+GRANT ALL ON WAREHOUSE COMPUTE_WH TO ROLE PATRICKTRANSFORM;
+GRANT ALL ON DATABASE MOVIELENS TO ROLE PATRICKTRANSFORM;
+GRANT ALL ON ALL SCHEMAS IN DATABASE MOVIELENS TO ROLE PATRICKTRANSFORM;
+GRANT ALL ON FUTURE SCHEMAS IN DATABASE MOVIELENS TO ROLE PATRICKTRANSFORM;
+GRANT ALL ON ALL TABLES IN SCHEMA MOVIELENS.RAW TO ROLE PATRICKTRANSFORM;
+GRANT ALL ON FUTURE TABLES IN SCHEMA MOVIELENS.RAW TO ROLE PATRICKTRANSFORM;
+
+-- CREATE Stage that would connect to you S3 Bucket
+CREATE OR REPLACE STAGE siaseDBT
+URL = 's3://siase-dbt'
+STORAGE_INTEGRATION = my_s3_integration 
+
+list @siaseDBT
+
+-- Set defaults
+USE WAREHOUSE COMPUTE_WH;
+USE DATABASE MOVIELENS;
+USE SCHEMA RAW;
+
+-- Load raw movies
+CREATE OR REPLACE TABLE raw_movies (
+  movieId INTEGER,
+  title STRING,
+  genres STRING
+);
+
+COPY INTO raw_movies
+FROM '@siaseDBT/movies.csv'
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"');
+
+-- Load raw_ratings
+CREATE OR REPLACE TABLE raw_ratings (
+  userId INTEGER,
+  movieId INTEGER,
+  rating FLOAT,
+  timestamp BIGINT
+);
+
+COPY INTO raw_ratings
+FROM '@siaseDBT/ratings.csv'
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"');
+
+-- Load raw_tags
+CREATE OR REPLACE TABLE raw_tags (
+  userId INTEGER,
+  movieId INTEGER,
+  tag STRING,
+  timestamp BIGINT
+);
+
+COPY INTO raw_tags
+FROM '@siaseDBT/tags.csv'
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+-- Load raw_genome_scores
+CREATE OR REPLACE TABLE raw_genome_scores (
+  movieId INTEGER,
+  tagId INTEGER,
+  relevance FLOAT
+);
+
+COPY INTO raw_genome_scores
+FROM '@siaseDBT/genome-scores.csv'
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"');
+
+-- Load raw_genome_tags
+CREATE OR REPLACE TABLE raw_genome_tags (
+  tagId INTEGER,
+  tag STRING
+);
+
+COPY INTO raw_genome_tags
+FROM '@siaseDBT/genome-tags.csv'
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+-- Load raw_links
+CREATE OR REPLACE TABLE raw_links (
+  movieId INTEGER,
+  imdbId INTEGER,
+  tmdbId INTEGER
+);
+
+COPY INTO raw_links
+FROM '@siaseDBT/links.csv'
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"');
+
+
+
+
