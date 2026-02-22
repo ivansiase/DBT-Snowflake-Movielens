@@ -30,30 +30,7 @@ dbt (Transformation Layer)
     ├── Fact & Dimension Models
     ├── Snapshots (SCD)
     └── Tests (Generic + Custom)
-## 🏗 Architecture
 
-```plaintext
-Snowflake Infrastructure        dbt Transformation Layer
----------------------           -----------------------
-Warehouse                       Sources
-Database                        Staging Models
-Schemas (RAW, STAGING, MART)    Fact & Dimension Models
-Roles & Grants                   Snapshots (SCD)
-Storage Integration              Tests (Generic + Custom)
-
-## 🧱 Snowflake Setup
-
-The `snowflake/` folder contains infrastructure scripts for:
-
-- Creating warehouses
-- Creating database and schemas
-- Defining roles and role hierarchy
-- Assigning grants and privileges
-- Configuring storage integration
-
-This demonstrates proper separation of infrastructure and transformation responsibilities.
-
----
 
 ## 📊 Data Modeling Approach
 
