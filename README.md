@@ -14,7 +14,7 @@ The goal is to design a structured analytics environment by:
 This project simulates how analytics environments are structured in real-world production systems.
 
 ---
-
+```plaintext
 ## 🏗 Architecture
 
 Snowflake (Infrastructure Layer)
@@ -30,7 +30,7 @@ dbt (Transformation Layer)
     ├── Fact & Dimension Models
     ├── Snapshots (SCD)
     └── Tests (Generic + Custom)
-
+```
 
 ## 📊 Data Modeling Approach
 
