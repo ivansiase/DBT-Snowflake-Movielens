@@ -87,9 +87,6 @@ Dimensional modeling principles were applied to support analytical queries.
 
 ---
 
+🙏 Acknowledgement
 
-
-
-dbt seed
-dbt run
-dbt test
+This project was inspired in part by learning materials from Darshil Parmar’s data/analytics engineering tutorials. While his content provided foundational guidance on Snowflake and dbt concepts, this implementation was independently built and extended to incorporate additional infrastructure setup, RBAC configuration, and modeling decisions tailored to simulate a production-style environment.
