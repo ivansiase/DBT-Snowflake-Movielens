@@ -16,6 +16,19 @@ This project simulates how analytics environments are structured in real-world p
 ---
 ## 🏗 Architecture
 ```plaintext
+
+Data Source (MovieLens Dataset)
+        ↓
+Amazon S3 (Manual Upload)
+        ↓
+Snowflake (RAW Layer)
+        ↓
+dbt (STAGING → MART)
+        ↓
+Analytics-Ready Models
+
+Infrastructure & Transformation Layers
+
 Snowflake (Infrastructure Layer)
     ├── Warehouse
     ├── Database
@@ -30,6 +43,15 @@ dbt (Transformation Layer)
     ├── Snapshots (SCD)
     └── Tests (Generic + Custom)
 ```
+📥 Data Ingestion Workflow
+
+1️⃣ The MovieLens dataset was manually uploaded to an Amazon S3 bucket.
+2️⃣ A Snowflake storage integration was configured to securely access S3.
+3️⃣ Data was loaded into Snowflake RAW schema using external stage + COPY INTO.
+4️⃣ dbt was then used to transform data from RAW → STAGING → MART layers.
+
+This mirrors a common real-world batch ingestion pattern used in modern cloud data platforms.
+
 
 ## 📊 Data Modeling Approach
 
